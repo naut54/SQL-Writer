@@ -6,32 +6,28 @@ import json
 from datetime import datetime
 
 class DatabaseApp:
-    VERSION = "1.3.2"  # Updated version number
-
+    VERSION = "2.3"
     def __init__(self, master):
         self.master = master
-        self.master.title("MySQL Database Connection")
-        
-        # Maximize the window
+        self.master.title("MySQL Writer")
         self.master.state('zoomed')
-        
-        # Set a minimum size for the window
         self.master.minsize(800, 600)
 
-        self.connection = None
-        self.log_folder = "C:/SQLWriterLogs"
+        self.log_folder = "C:/SQLWriterLogs"  # Define log_folder before its usage
+        self.ensure_log_folder_exists()       # Ensure the log folder exists
         self.config_file = os.path.join(self.log_folder, "config.json")
-        
-        self.ensure_log_folder_exists()
-        self.connection_details = self.load_connection_details()  # Load and assign connection details
+        self.connection_details = {}
+        self.load_connection_details()
+
         self.create_widgets()
+        self.connection = None
 
     def load_connection_details(self):
         if os.path.exists(self.config_file):
             with open(self.config_file, 'r') as f:
-                return json.load(f)
+                self.connection_details = json.load(f)
         else:
-            return {
+            self.connection_details = {
                 'host': '',
                 'port': '',
                 'user': '',
@@ -39,12 +35,7 @@ class DatabaseApp:
                 'database': ''
             }
 
-    def ensure_log_folder_exists(self):
-        if not os.path.exists(self.log_folder):
-            os.makedirs(self.log_folder)
-
     def create_widgets(self):
-        # Main frame to contain all widgets
         main_frame = ttk.Frame(self.master)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
@@ -82,6 +73,9 @@ class DatabaseApp:
 
         self.save_button = ttk.Button(conn_frame, text="Save Connection", command=self.save_connection_details)
         self.save_button.grid(row=3, column=2, pady=10)
+        
+        self.delete_button = ttk.Button(conn_frame, text="Delete Connections", command=self.delete_connection)
+        self.delete_button.grid(row=3, column=3, pady=10)
 
         query_frame = ttk.LabelFrame(main_frame, text="SQL Query")
         query_frame.pack(padx=10, pady=10, fill="both", expand=True)
@@ -101,12 +95,6 @@ class DatabaseApp:
         self.version_label = ttk.Label(main_frame, text=f"v{self.VERSION}")
         self.version_label.pack(side=tk.BOTTOM, anchor=tk.SE, padx=10, pady=5)
 
-    def load_connection_details(self):
-        self.connection_details = {}
-        if os.path.exists(self.config_file):
-            with open(self.config_file, 'r') as f:
-                self.connection_details = json.load(f)
-
     def save_connection_details(self):
         connection_details = {
             'host': self.host_entry.get(),
@@ -119,17 +107,23 @@ class DatabaseApp:
             json.dump(connection_details, f)
         messagebox.showinfo("Success", "Connection details saved successfully!")
 
+    def delete_connection(self):
+        os.remove(self.config_file)
+        messagebox.showinfo("Success", "Connection details deleted successfully!")
+
     def connect_to_database(self):
         host = self.host_entry.get()
-        port = int(self.port_entry.get())
+        port = self.port_entry.get()
         user = self.user_entry.get()
         password = self.password_entry.get()
         database = self.database_entry.get()
 
+        print(f"Connecting to database at {host}:{port} with user {user}")  # Debugging statement
+
         try:
             self.connection = pymysql.connect(
                 host=host,
-                port=port,
+                port=int(port),
                 user=user,
                 password=password,
                 database=database
