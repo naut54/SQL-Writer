@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 class DatabaseApp:
-    VERSION = "2.3"
+    VERSION = "2.5"
     def __init__(self, master):
         self.master = master
         self.master.title("MySQL Writer")
