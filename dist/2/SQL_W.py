@@ -13,8 +13,8 @@ class DatabaseApp:
         self.master.state('zoomed')
         self.master.minsize(800, 600)
 
-        self.log_folder = "C:/SQLWriterLogs"  # Define log_folder before its usage
-        self.ensure_log_folder_exists()       # Ensure the log folder exists
+        self.log_folder = "C:/SQLWriterLogs"
+        self.ensure_log_folder_exists()
         self.config_file = os.path.join(self.log_folder, "config.json")
         self.connection_details = {}
         self.load_connection_details()
@@ -39,7 +39,6 @@ class DatabaseApp:
         main_frame = ttk.Frame(self.master)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
-        # Connection frame
         conn_frame = ttk.LabelFrame(main_frame, text="Database Connection")
         conn_frame.pack(padx=10, pady=10, fill="x")
 
@@ -73,7 +72,7 @@ class DatabaseApp:
 
         self.save_button = ttk.Button(conn_frame, text="Save Connection", command=self.save_connection_details)
         self.save_button.grid(row=3, column=2, pady=10)
-        
+
         self.delete_button = ttk.Button(conn_frame, text="Delete Connections", command=self.delete_connection)
         self.delete_button.grid(row=3, column=3, pady=10)
 
